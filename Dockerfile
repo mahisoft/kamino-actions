@@ -1,6 +1,8 @@
 # Container image that runs your code
 FROM mahisoft/kamino-build-images:11-jdk-alpine-docker
 
+RUN printenv
+
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
 
