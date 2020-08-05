@@ -1,5 +1,3 @@
 #!/bin/sh -l
 
-echo "Hello $1"
-time=$(date)
-echo "::set-output name=time::$time"
+SPRING_PROFILES_ACTIVE=build ./gradlew clean check --info
