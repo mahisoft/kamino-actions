@@ -1,3 +1,3 @@
 #!/bin/sh -l
 
-SPRING_PROFILES_ACTIVE=build ./gradlew clean check --info
+SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info

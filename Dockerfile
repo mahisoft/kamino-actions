@@ -1,8 +1,6 @@
 # Container image that runs your code
 FROM mahisoft/kamino-build-images:11-jdk-alpine-docker
 
-WORKDIR ${GITHUB_WORKSPACE}
-
 ENV GRADLE_USER_HOME=gradle_config
 
 COPY gradle_config gradle_config
