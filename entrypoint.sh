@@ -8,4 +8,6 @@ releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/"
 
 echo "${PROPERTIES}" > /build_env/gradle_config/gradle.properties
 
+docker-compose -f ${GITHUB_WORKSPACE}/docker-compose.yml up -d
+
 SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info
