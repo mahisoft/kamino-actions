@@ -7,8 +7,8 @@ initscript {
                     credentials {
                         Properties properties = new Properties()
                         properties.load(new File(getGradleUserHomeDir(), 'gradle.properties').newDataInputStream())
-                        username System.getenv("NEXUS_CREDENTIALS_USR")
-                        password System.getenv("NEXUS_CREDENTIALS_PSW")
+                        username properties.mahiNexusUsername
+                        password properties.mahiNexusPassword
                     }
                 }
                 gradlePluginPortal()
