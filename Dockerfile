@@ -1,8 +1,11 @@
 # Container image that runs your code
 FROM mahisoft/kamino-build-images:11-jdk-alpine-docker
 
-ADD init.gradle ~/.gradle/init.gradle
-ADD gradle.properties ~/.gradle/gradle.properties
+WORKDIR ${GITHUB_WORKSPACE}
+
+ENV GRADLE_USER_HOME=gradle_config
+
+COPY gradle_config gradle_config
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
