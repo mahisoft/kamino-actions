@@ -5,6 +5,3 @@ description: 'Builds a Kamino microservice code'
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  env:
-    NEXUS_CREDENTIALS_USR: ${{ env.NEXUS_CREDENTIALS_USR }}
-    NEXUS_CREDENTIALS_PSW: ${{ env.NEXUS_CREDENTIALS_PSW }}
