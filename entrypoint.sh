@@ -19,6 +19,6 @@ echo "${COMPOSE_OVERRIDE}" > /build_env/env.network.yml
 
 docker network create "${GITHUB_RUN_ID}"
 
-docker-compose -f ${GITHUB_WORKSPACE}/docker-compose.yml -f env.network.yml up -d
+docker-compose -f ${GITHUB_WORKSPACE}/docker-compose.yml -f /build_env/env.network.yml up -d
 
 SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info
