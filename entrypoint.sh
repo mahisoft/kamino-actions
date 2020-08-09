@@ -11,7 +11,7 @@ version: '3'
 networks:
   default:
     external:
-      name: ${GITHUB_RUN_ID}"
+      name: '${GITHUB_RUN_ID}'"
 
 echo "${PROPERTIES}" > /build_env/gradle_config/gradle.properties
 
