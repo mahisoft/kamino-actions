@@ -25,6 +25,6 @@ docker network connect ${GITHUB_RUN_ID} ${HOSTNAME}
 
 # SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info
 
-./gradlew bootJar
+${GITHUB_WORKSPACE}/gradlew bootJar
 
 docker build .
