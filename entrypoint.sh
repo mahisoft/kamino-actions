@@ -6,6 +6,7 @@ sharedMavenUrl=https://nexus.mahisoft.com/repository/maven-public/
 snapshotUploadUrl=https://nexus.mahisoft.com/repository/maven-snapshots/
 releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/"
 
+echo "${PROPERTIES}" > /build_env/gradle_config/gradle.properties
 
 ${GITHUB_WORKSPACE}/gradlew bootJar
 
