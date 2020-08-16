@@ -23,8 +23,6 @@ docker-compose -f ${GITHUB_WORKSPACE}/docker-compose.yml -f /build_env/env.netwo
 
 docker network connect ${GITHUB_RUN_ID} ${HOSTNAME}
 
-# SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info
+export SPRING_PROFILES_ACTIVE=build
 
-${GITHUB_WORKSPACE}/gradlew bootJar
-
-docker build .
+${GITHUB_WORKSPACE}/gradlew clean check --info
