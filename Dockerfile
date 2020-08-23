@@ -5,6 +5,8 @@ RUN apk add --no-cache libc6-compat
 
 RUN echo "${GCLOUD_CREDENTIALS}" > ${GITHUB_WORKSPACE}/json_key.json
 
+RUN ls -la ${GITHUB_WORKSPACE}
+
 RUN gcloud auth activate-service-account --key-file ${GITHUB_WORKSPACE}/json_key.json --project kamino-182816
 
 RUN helm plugin install https://github.com/nouney/helm-gcs
