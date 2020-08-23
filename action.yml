@@ -1,6 +1,6 @@
 # action.yml
-name: 'Kamino ms build'
-description: 'Builds a Kamino microservice code'
+name: 'Deploy'
+description: 'Deploy'
 
 runs:
   using: 'docker'

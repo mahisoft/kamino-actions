@@ -1,14 +1,14 @@
 # Container image that runs your code
-FROM mahisoft/kamino-build-images:11-jdk-alpine-docker
+FROM devth/helm:v3.1.3
 
-ENV GRADLE_USER_HOME=/build_env/gradle_config
+RUN apk add --no-cache libc6-compat
 
-WORKDIR /build_env
+RUN echo "${GCLOUD_CREDENTIALS}" > /json_key.json
 
-COPY gradle_config gradle_config
+RUN gcloud auth activate-service-account --key-file /json_key.json --project kamino-182816
 
-# Copies your code file from your action repository to the filesystem path `/` of the container
-COPY entrypoint.sh /entrypoint.sh
+RUN helm plugin install https://github.com/nouney/helm-gcs
 
-# Code file to execute when the docker container starts up (`entrypoint.sh`)
-ENTRYPOINT ["/entrypoint.sh"]
+RUN helm repo add social-coach-stable gs://social-coach/stable
+
+RUN helm repo update
