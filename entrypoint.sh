@@ -1,13 +1,15 @@
 #!/bin/sh -l
 
-PROPERTIES="mahiNexusUsername=${NEXUS_USER}
-mahiNexusPassword=${NEXUS_PASSWORD}
-sharedMavenUrl=https://nexus.mahisoft.com/repository/maven-public/
-snapshotUploadUrl=https://nexus.mahisoft.com/repository/maven-snapshots/
-releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/"
+echo "${GCLOUD_CREDENTIALS}" > ${GITHUB_WORKSPACE}/json_key.json
 
-echo "${PROPERTIES}" > /build_env/gradle_config/gradle.properties
+ls -la ${GITHUB_WORKSPACE}
 
-${GITHUB_WORKSPACE}/gradlew bootJar
+printenv
 
-docker build .
+gcloud auth activate-service-account --key-file ${GITHUB_WORKSPACE}/json_key.json --project kamino-182816
+
+helm plugin install https://github.com/nouney/helm-gcs
+
+helm repo add social-coach-stable gs://social-coach/stable
+
+helm repo update
