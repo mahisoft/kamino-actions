@@ -16,4 +16,4 @@ helm repo update
 
 ls ms-account-service
 
-helm upgrade -i ms-account-service ./social-coach-ms-service-sql-ng-1.0.0.tgz --namespace github -f ms-account-service/values.yml -f ms-account-service/dev.yml --reset-values --set image.tag=latest
+helm upgrade -i ms-account-service ./social-coach-ms-service-sql-ng-1.0.0.tgz --namespace github -f ms-account-service/values.yaml -f ms-account-service/dev.yaml --reset-values --set image.tag=latest
