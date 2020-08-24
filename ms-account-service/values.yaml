@@ -1,0 +1,31 @@
+image:
+    repository: kamino-182816/githubactions
+    tag:
+    pullPolicy: Always
+  
+  secretAvailable: false
+  
+  service:
+    name: ms-account
+      
+  resources:
+    limits:
+      cpu: 600m
+      memory: 650Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+      
+  springProfilesActive: cloud,ci,dov
+  
+  livenessProbe:
+    path: /actuator/health
+  readinessProbe:
+    path: /actuator/health
+      
+  server:
+    xms: "64m"
+    xmx: "450m"
+  
+  imagePullSecrets:
+    - name: gcr-json-key
