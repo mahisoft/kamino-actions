@@ -14,6 +14,6 @@ helm repo update
 
 /google-cloud-sdk/bin/gcloud container clusters get-credentials mahisoft-development --zone us-central1-a --project kamino-182816
 
-ls ms-account-service
+ls -la 
 
 helm upgrade -i ms-account-service ./social-coach-ms-service-sql-ng-1.0.0.tgz --namespace github -f ms-account-service/values.yaml -f ms-account-service/dev.yaml --reset-values --set image.tag=latest
