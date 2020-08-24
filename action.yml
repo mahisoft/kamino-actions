@@ -3,10 +3,5 @@ name: 'Deploy'
 description: 'Deploy'
 
 runs:
-  using: "composite"
-  steps:
-    - name: Checkout
-      using: actions/checkout@v2
-    - name: deploy
-      using: 'docker'
-      image: 'Dockerfile'
+  using: 'docker'
+  image: 'Dockerfile'
