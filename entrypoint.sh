@@ -25,7 +25,7 @@ echo "mahiNexusUsername=$NEXUS_USER
     releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/" >> gradle.properties
 
 # Build
-./gradlew clean check --debug --init-script ./init.gradle
+./gradlew clean check --info --init-script ./init.gradle
 ./gradlew bootJar --init-script ./init.gradle
 
 # Install and run sematic-release
@@ -45,14 +45,16 @@ semantic-release --branches master --repository-url $GITHUB_REPO
 echo "$(git describe --tag)"
 VERSION_TAG="$(git describe --tag)"
 
-# Generate latest tag
-if [ $BRANCH_NAME = "library-action" ]
+# Generate latest tag and check if release
+if [ $BRANCH_NAME = "master" ]
 then 
-  LATEST_TAG="-SNAPSHOT"
-else
   LATEST_TAG=""
+  export RELEASE="true"
+else
+  LATEST_TAG="-SNAPSHOT"
+  export RELEASE="false"
 fi
 
+
 # Publish to nexus
-# PROJECT_VERSION=$VERSION_TAG$LATEST_TAG ./gradlew publish --info --init-script ./init.gradle
-echo "PROJECT_VERSION=$VERSION_TAG$LATEST_TAG"
+PROJECT_VERSION=$VERSION_TAG$LATEST_TAG ./gradlew publish --info --init-script ./init.gradle
