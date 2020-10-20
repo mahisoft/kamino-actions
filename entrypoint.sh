@@ -26,7 +26,7 @@ echo "mahiNexusUsername=$NEXUS_USER
 
 # Build
 ./gradlew clean check --info --init-script ./init.gradle
-./gradlew bootJar --init-script ./init.gradle
+./gradlew jar --init-script ./init.gradle
 
 # Install and run sematic-release
 echo '{
