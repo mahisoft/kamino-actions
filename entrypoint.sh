@@ -46,7 +46,7 @@ echo "$(git describe --tag)"
 VERSION_TAG="$(git describe --tag)"
 
 # Generate latest tag and check if release
-if [ $BRANCH_NAME = "master" ]
+if [ $BRANCH_NAME = "refs/heads/master" ]
 then 
   LATEST_TAG=""
   export RELEASE="true"
