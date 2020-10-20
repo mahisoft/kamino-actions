@@ -39,14 +39,14 @@ echo '{
       }' >> .releaserc
 sudo npm install -g --save-dev semantic-release
 sudo npm -g install @semantic-release/git@8.0.0 @semantic-release/github @semantic-release/exec
-semantic-release --branches master --repository-url ${{ github.repository }}
+semantic-release --branches master --repository-url $GITHUB_REPO
 
 # Generate version tag
 echo "$(git describe --tag)"
 export VERSION_TAG="$(git describe --tag)"
 
 # Generate latest tag
-if [ "${GITHUB_REF:11}" = "develop" ]
+if [ $BRANCH_NAME = "library-action" ]
 then 
   export LATEST_TAG="-SNAPSHOT"
 else
