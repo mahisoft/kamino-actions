@@ -43,14 +43,14 @@ semantic-release --branches master --repository-url $GITHUB_REPO
 
 # Generate version tag
 echo "$(git describe --tag)"
-export VERSION_TAG="$(git describe --tag)"
+VERSION_TAG="$(git describe --tag)"
 
 # Generate latest tag
 if [ $BRANCH_NAME = "library-action" ]
 then 
-  export LATEST_TAG="-SNAPSHOT"
+  LATEST_TAG="-SNAPSHOT"
 else
-  export LATEST_TAG=""
+  LATEST_TAG=""
 fi
 
 # Publish to nexus
