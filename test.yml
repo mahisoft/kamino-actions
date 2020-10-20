@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [ develop, master ]
+jobs:
+  upload-library-kamino:
+    runs-on: ubuntu-18.04
+    steps:
+    - run: git fetch --unshallow --tags
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+    - uses: actions/checkout@v2
+      with:
+        repository: mahisoft/kamino-actions
+        ref: refs/origin/library-action
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: run-library-action
+      uses: ./
+      env:
+        NEXUS_USER: ${{ secrets.NEXUS_USER }}
+        NEXUS_PASS: ${{ secrets.NEXUS_PASS }}
+        BRANCH_NAME: ${{ github.ref }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE: ${{ github.ref == 'refs/heads/master' }}
+      

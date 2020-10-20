@@ -1,30 +1,58 @@
-#!/bin/sh -l
+# Create configuration files
+echo "initscript {
+    gradle.settingsEvaluated { settings ->
+        settings.pluginManagement {
+            repositories {
+                maven {
+                    url 'https://nexus.mahisoft.com/repository/maven-public/'
+                    credentials {
+                        Properties properties = new Properties()
+                        properties.load(new File('./gradle.properties').newDataInputStream())
+                        username properties.mahiNexusUsername
+                        password properties.mahiNexusPassword
+                    }
+                }
+                gradlePluginPortal()
+            }
+        }
+    }
+}" >> init.gradle
 
-PROPERTIES="mahiNexusUsername=${NEXUS_USER}
-mahiNexusPassword=${NEXUS_PASSWORD}
-sharedMavenUrl=https://nexus.mahisoft.com/repository/maven-public/
-snapshotUploadUrl=https://nexus.mahisoft.com/repository/maven-snapshots/
-releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/"
+echo "mahiNexusUsername=$NEXUS_USER
+    mahiNexusPassword=$NEXUS_PASS
+    sharedMavenUrl=https://nexus.mahisoft.com/repository/maven-public/
+    snapshotUploadUrl=https://nexus.mahisoft.com/repository/maven-snapshots/
+    releaseUploadUrl=https://nexus.mahisoft.com/repository/maven-releases/" >> gradle.properties
 
-COMPOSE_OVERRIDE="
-version: '3'
-networks:
-  default:
-    external:
-      name: '${GITHUB_RUN_ID}'"
+# Build
+./gradlew clean check --debug --init-script ./init.gradle
+./gradlew bootJar --init-script ./init.gradle
 
-echo "${PROPERTIES}" > /build_env/gradle_config/gradle.properties
+# Install and run sematic-release
+echo '{
+        "branches": ["master"],
+        "plugins":[
+          "@semantic-release/commit-analyzer",
+          "@semantic-release/release-notes-generator",
+          ["@semantic-release/exec", { "publish" : "--no-ci -t '${version}'" }]
+        ]
+      }' >> .releaserc
+sudo npm install -g --save-dev semantic-release
+sudo npm -g install @semantic-release/git@8.0.0 @semantic-release/github @semantic-release/exec
+semantic-release --branches master --repository-url ${{ github.repository }}
 
-echo "${COMPOSE_OVERRIDE}" > /build_env/env.network.yml
+# Generate version tag
+echo "$(git describe --tag)"
+export VERSION_TAG="$(git describe --tag)"
 
-docker network create "${GITHUB_RUN_ID}"
+# Generate latest tag
+if [ "${GITHUB_REF:11}" = "develop" ]
+then 
+  export LATEST_TAG="-SNAPSHOT"
+else
+  export LATEST_TAG=""
+fi
 
-docker-compose -f ${GITHUB_WORKSPACE}/docker-compose.yml -f /build_env/env.network.yml up -d
-
-docker network connect ${GITHUB_RUN_ID} ${HOSTNAME}
-
-# SPRING_PROFILES_ACTIVE=build ${GITHUB_WORKSPACE}/gradlew clean check --info
-
-${GITHUB_WORKSPACE}/gradlew bootJar
-
-docker build .
+# Publish to nexus
+# PROJECT_VERSION=$VERSION_TAG$LATEST_TAG ./gradlew publish --info --init-script ./init.gradle
+echo "PROJECT_VERSION=$VERSION_TAG$LATEST_TAG"

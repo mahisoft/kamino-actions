@@ -1,7 +1,8 @@
 # action.yml
-name: 'Kamino ms build'
-description: 'Builds a Kamino microservice code'
-
+name: 'Kamino Library Build'
+description: 'Builds a Kamino library code'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "composite"
+  steps: 
+    - run: ${{ github.action_path }}/entrypoint.sh
+      shell: bash
