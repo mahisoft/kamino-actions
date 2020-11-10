@@ -1,8 +1,0 @@
-# action.yml
-name: 'Kamino Library Build'
-description: 'Builds a Kamino library code'
-runs:
-  using: "composite"
-  steps: 
-    - run: ${{ github.action_path }}/entrypoint.sh
-      shell: bash

@@ -1,0 +1,98 @@
+name: CI
+on:
+  push:
+    branches: [ develop, master ]
+
+jobs:
+   
+  check-build-push:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - run: git fetch --unshallow --tags
+    - name: create configuration files
+      env:
+        NEXUS_CRED: ${{ secrets.NEXUS_CRED }}
+      run: |
+        echo "@kamino:registry=https://nexus.mahisoft.com/repository/kamino-public-npm/
+        //nexus.mahisoft.com/repository/kamino-public-npm/:_auth=${NEXUS_CRED}
+        " >> .npmrc
+                
+    - name: Validate
+      run: |
+        yarn install
+        yarn test
+        
+    - name: Install and run sematic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo '{
+                "branches": ["master"],
+                "plugins":[
+                  "@semantic-release/commit-analyzer",
+                  "@semantic-release/release-notes-generator",
+                  ["@semantic-release/exec", { "publish" : "--no-ci -t '${version}'" }]
+                ]
+              }' >> .releaserc
+        sudo npm install -g --save-dev semantic-release
+        sudo npm -g install @semantic-release/git@8.0.0 @semantic-release/github @semantic-release/exec
+        semantic-release --branches master --repository-url ${{ github.repository }}
+        
+    - name: version tag
+      id: version-tag
+      run: |
+        echo "$(git describe --tag)"
+        echo "::set-output name=VERSION_TAG::'$(git describe --tag)'"
+        
+    - name: latest tag
+      id: latest-tag
+      run: |
+        if [ "${GITHUB_REF:11}" = "develop" ]
+        then 
+          echo "::set-output name=LATEST_TAG::'-SNAPSHOT'"
+        else
+          echo "::set-output name=LATEST_TAG::''"
+        fi
+        
+    - name: Build and push Docker image
+      run: |
+        docker login docker.pkg.github.com -u github.repository_owner --password ${{ github.token }}
+        export repo_name=${{ github.repository }}
+        docker build . -t docker.pkg.github.com/"$(echo ${repo_name,,})"/chat-website:${{ steps.version-tag.outputs.VERSION_TAG }}${{ steps.latest-tag.outputs.LATEST_TAG }}
+        docker push docker.pkg.github.com/"$(echo ${repo_name,,})"/chat-website:${{ steps.version-tag.outputs.VERSION_TAG }}${{ steps.latest-tag.outputs.LATEST_TAG }}
+        echo ${{ steps.version-tag.outputs.VERSION_TAG }}${{ steps.latest-tag.outputs.LATEST_TAG }} > tag_version
+        
+    - name: Save version tag to file
+      uses: actions/upload-artifact@v1
+      with:
+        name: tag
+        path: tag_version 
+
+
+  deploy:
+    needs: check-build-push
+    env:
+      KUBE_CONTEXT: ${{ secrets.KUBE_CONTEXT }}
+      KUBECONFIG: "./config"    
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        repository: ${{ github.repository_owner }}/mahisoft-charts
+        token: ${{ secrets.REPOS }}
+        
+    - name: Create kubernetes config file
+      run: |
+        echo "$KUBE_CONTEXT" > config  
+        
+    - name: Download version tag generated 
+      uses: actions/download-artifact@v1
+      with:
+        name: tag
+    
+    - name: Upgrade service in cluster
+      run: |
+        cat tag/tag_version
+        export service_name=$(echo ${{ github.repository }} | cut -d'/' -f 2)
+        helm upgrade -i $service_name ./stable/$service_name --namespace=chat --reset-values --recreate-pods --set image.tag="$(cat tag/tag_version)"        
