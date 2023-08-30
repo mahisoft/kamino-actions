@@ -30,7 +30,7 @@ echo "mahiNexusUsername=$NEXUS_USER
 
 # Install and run sematic-release
 echo '{
-        "branches": ["master"],
+        "branches": ["master", {name: "beta", prerelease: true} ],
         "plugins":[
           "@semantic-release/commit-analyzer",
           "@semantic-release/release-notes-generator",
@@ -39,14 +39,14 @@ echo '{
       }' >> .releaserc
 sudo npm install -g --save-dev semantic-release
 sudo npm -g install @semantic-release/git@8.0.0 @semantic-release/github @semantic-release/exec
-semantic-release --branches master --repository-url $GITHUB_REPO
+semantic-release --repository-url $GITHUB_REPO
 
 # Generate version tag
 echo "$(git describe --tag)"
 VERSION_TAG="$(git describe --tag)"
 
 # Generate latest tag and check if release
-if [ $BRANCH_NAME = "refs/heads/master" ]
+if [ ($BRANCH_NAME = "refs/heads/master" ] || [ ($BRANCH_NAME = "refs/heads/beta" ]
 then 
   LATEST_TAG=""
   export RELEASE="true"
